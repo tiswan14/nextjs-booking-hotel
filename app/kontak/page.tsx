@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import HeaderSection from "@/components/header-section"
+import ContactForm from "@/components/contact-form"
 import {
     IoMailOutline,
     IoCallOutline,
@@ -41,7 +42,7 @@ const ContactPage = () => {
                                     key={index}
                                     className="flex items-start gap-4 p-4 bg-white hover:bg-gray-50 rounded-lg shadow transition-transform hover:scale-[1.02]"
                                 >
-                                    <div className="flex-none bg-blue-500 p-3 rounded-full shadow-md">
+                                    <div className="flex-none bg-orange-400 p-3 rounded-full shadow-md">
                                         {item.icon}
                                     </div>
                                     <div className="flex-1">
@@ -53,6 +54,7 @@ const ContactPage = () => {
                         </ul>
                     </div>
                     {/* Contact Form */}
+                    <ContactForm />
                 </div>
             </div>
         </div>
