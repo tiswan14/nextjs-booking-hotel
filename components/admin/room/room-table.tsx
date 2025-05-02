@@ -1,6 +1,8 @@
 import { getRooms } from "@/lib/data"
 import Image from "next/image";
 import { formatDate, formatCurrency } from "@/lib/utils";
+import { DeleteButton } from "./button";
+import { IoPencilOutline, IoTrashOutline } from "react-icons/io5";
 const RoomTable = async () => {
     const rooms = await getRooms();
     if (!rooms?.length) return <div className="bg-white p-6 mt-6 rounded-2xl shadow-md overflow-x-auto">Tidak ada kamar</div>;
@@ -37,10 +39,16 @@ const RoomTable = async () => {
                             <td className="px-6 py-4">
                                 {formatDate(room.createdAt.toString())}
                             </td>
-                            <td className="px-6 py-4 text-center space-x-2">
-                                <button className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Edit</button>
-                                <button className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600">Hapus</button>
+                            <td className="px-6 py-4 text-center flex space-x-4 items-center justify-center">
+                                <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105">
+                                    <IoPencilOutline className="w-5 h-5 mr-2" />
+                                    Edit
+                                </button>
+                                <DeleteButton id={room.id} image={room.image} />
                             </td>
+
+
+
                         </tr>
                     ))}
                 </tbody>

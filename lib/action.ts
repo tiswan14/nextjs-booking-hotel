@@ -3,6 +3,8 @@
 import { prisma } from "@/lib/prisma";
 import { ContactSchema, RoomSchema } from "./zod";
 import { redirect } from "next/navigation";
+import { del } from "@vercel/blob";
+import { revalidatePath } from "next/cache";
 
 export const saveRoom = async (image: string, prevState: unknown, formData: FormData) => {
     if (!image) return { message: "Image wajib di isi!" }
@@ -85,3 +87,17 @@ export const ContactMessage = async (prevState: unknown, formData: FormData) => 
     }
 };
 
+
+export const deleteRoom = async (id: string, image: strring) => {
+    try {
+        await del(image);
+        await prisma.room.delete({
+            where: { id }
+        })
+    } catch (error) {
+        console.log(error);
+
+    }
+    revalidatePath("/admin/room")
+
+}
