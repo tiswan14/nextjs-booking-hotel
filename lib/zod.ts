@@ -1,4 +1,12 @@
-import { object, string } from "zod";
+import { object, string, coerce, array } from "zod";
+
+export const RoomSchema = object({
+    name: string().min(3),
+    description: string().min(30),
+    capacity: coerce.number().gt(0),
+    price: coerce.number().gt(0),
+    amenities: array(string()).nonempty(),
+})
 
 export const ContactSchema = object({
     name: string().min(3, "Nama minimal 3 karakter"),
@@ -8,3 +16,4 @@ export const ContactSchema = object({
         .min(10, "Pesan harus terdiri dari minimal 10 karakter")
         .max(200, "Pesan tidak boleh melebihi 200 karakter"),
 });
+

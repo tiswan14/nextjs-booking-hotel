@@ -38,9 +38,11 @@ model Amenities {
 model RoomAmenities {
   id          String    @id @default(cuid())
   roomId      String
-  Room        Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  room        Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
   amenitiesId String
-  Amenities   Amenities @relation(fields: [amenitiesId], references: [id], onDelete: Cascade)
+  amenities   Amenities @relation(fields: [amenitiesId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, amenitiesId]) 
 }
 
 model Reservation {

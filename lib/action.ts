@@ -1,7 +1,53 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { ContactSchema } from "./zod";
+import { ContactSchema, RoomSchema } from "./zod";
+import { redirect } from "next/navigation";
+
+export const saveRoom = async (image: string, prevState: unknown, formData: FormData) => {
+    if (!image) return { message: "Image wajib di isi!" }
+
+    const rawData = {
+        name: formData.get("name") ?? "",
+        description: formData.get("description") ?? "",
+        capacity: Number(formData.get("capacity") ?? 0),
+        price: Number(formData.get("price") ?? 0),
+        amenities: formData.getAll("amenities") ?? [],
+    }
+
+
+
+    const validatedFields = RoomSchema.safeParse(rawData)
+
+    if (!validatedFields.success) {
+        return { error: validatedFields.error.flatten().fieldErrors }
+    }
+
+    const { name, description, price, capacity, amenities } = validatedFields.data
+
+    try {
+        await prisma.room.create({
+            data: {
+                name,
+                description,
+                image,
+                price,
+                capacity,
+                RoomAmenities: {
+                    createMany: {
+                        data: amenities.map((item: string) => ({
+                            amenitiesId: item
+                        }))
+                    }
+                }
+            }
+        })
+    } catch (error) {
+        console.log(error);
+    }
+    redirect("/admin/room");
+}
+
 
 export const ContactMessage = async (prevState: unknown, formData: FormData) => {
     const validateField = ContactSchema.safeParse(
@@ -38,3 +84,4 @@ export const ContactMessage = async (prevState: unknown, formData: FormData) => 
         return { error: { global: "Gagal mengirim pesan. Silakan coba lagi nanti." } };
     }
 };
+
