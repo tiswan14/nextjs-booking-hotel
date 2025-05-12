@@ -122,7 +122,6 @@ const CreateForm = ({ amenities }: { amenities: Amenities[] }) => {
 
 
 
-
             </div>
 
             <div className="col-span-12 md:col-span-4 bg-white p-4">

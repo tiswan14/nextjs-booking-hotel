@@ -1,6 +1,7 @@
 "use client"
 import { useState } from 'react'
 import { IoClose, IoMenu } from 'react-icons/io5'
+import { FaSignOutAlt, FaUserPlus } from "react-icons/fa";
 import clsx from 'clsx'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
@@ -56,7 +57,7 @@ const Navlink = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link href="/rooms" className="block py-2 px-3 text-gray-800 hover:bg-gray-100 rounded-sm md:hover:bg-transparent md:p-0">
+                        <Link href="/room" className="block py-2 px-3 text-gray-800 hover:bg-gray-100 rounded-sm md:hover:bg-transparent md:p-0">
                             Ruangan
                         </Link>
                     </li>
@@ -90,18 +91,29 @@ const Navlink = () => {
                     )}
                     {session ? (
                         <li className="pt-8 px-3 md:pt-0">
-                            <button onClick={() => signOut()} className="md:hidden py-2.5 px-4 bg-red-400 text-white hover:bg-red-600 rounded-sm cursor-pointer">
-                                Logout
+                            <button
+                                onClick={() => signOut()}
+                                className="flex items-center gap-2 py-2.5 px-4 bg-red-500 text-white hover:bg-red-600 rounded-md shadow-md transition duration-200 ease-in-out md:hidden"
+                                title="Logout"
+                            >
+                                <FaSignOutAlt className="w-5 h-5" />
+                                <span>Logout</span>
                             </button>
                         </li>
-                    ) : (
 
+                    ) : (
                         <li className="pt-8 px-3 md:pt-0">
-                            <Link href="/register" className="py-2.5 px-6 bg-orange-400 text-white hover:bg-orange-500 rounded-sm">
-                                Daftar
+                            <Link
+                                href="/register"
+                                className="flex items-center gap-2 py-2.5 px-4 md:px-6 w-fit bg-orange-500 text-white hover:bg-orange-600 rounded-md shadow-md transition duration-200 ease-in-out"
+                            >
+                                <FaUserPlus />
+                                <span>Daftar</span>
                             </Link>
                         </li>
+
                     )}
+
                 </ul>
             </div>
         </>
