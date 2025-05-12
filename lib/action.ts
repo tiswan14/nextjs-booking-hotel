@@ -51,6 +51,7 @@ export const saveRoom = async (image: string, prevState: unknown, formData: Form
 }
 
 
+
 export const ContactMessage = async (prevState: unknown, formData: FormData) => {
     const validateField = ContactSchema.safeParse(
         Object.fromEntries(formData.entries())
@@ -88,7 +89,7 @@ export const ContactMessage = async (prevState: unknown, formData: FormData) => 
 };
 
 
-export const deleteRoom = async (id: string, image: strring) => {
+export const deleteRoom = async (id: string, image: string) => {
     try {
         await del(image);
         await prisma.room.delete({
@@ -100,4 +101,60 @@ export const deleteRoom = async (id: string, image: strring) => {
     }
     revalidatePath("/admin/room")
 
+}
+
+// Update Room
+export const updateRoom = async (
+    image: string,
+    roomId: string,
+    prevState: unknown,
+    formData: FormData
+) => {
+    if (!image) return { message: "Image wajib di isi!" }
+
+    const rawData = {
+        name: formData.get("name") ?? "",
+        description: formData.get("description") ?? "",
+        capacity: Number(formData.get("capacity") ?? 0),
+        price: Number(formData.get("price") ?? 0),
+        amenities: formData.getAll("amenities") ?? [],
+    }
+
+    const validatedFields = RoomSchema.safeParse(rawData)
+
+    if (!validatedFields.success) {
+        return { error: validatedFields.error.flatten().fieldErrors }
+    }
+
+    const { name, description, price, capacity, amenities } = validatedFields.data
+
+    try {
+        await prisma.$transaction([
+            prisma.room.update({
+                where: { id: roomId },
+                data: {
+                    name,
+                    description,
+                    image,
+                    price,
+                    capacity,
+                    RoomAmenities: {
+                        deleteMany: {},
+                    },
+                },
+            }),
+            prisma.roomAmenities.createMany({
+                data: amenities.map((item) => ({
+                    roomId,
+                    amenitiesId: item,
+                })),
+            }),
+        ])
+    } catch (error) {
+        console.log(error);
+        return { error: "Terjadi kesalahan saat memperbarui data kamar." }
+    }
+
+    revalidatePath("/admin/room")
+    redirect("/admin/room");
 }
