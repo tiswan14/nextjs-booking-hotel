@@ -70,3 +70,33 @@ export const getRoomDetailById = async (roomId: string) => {
         throw new Error("Failed to fetch room details");
     }
 };
+
+
+export const getReservationById = async (id: string) => {
+    try {
+        const result = await prisma.reservation.findUnique({
+            where: { id },
+            include: {
+                Room: {
+                    select: {
+                        name: true,
+                        image: true,
+                        price: true,
+                    }
+                },
+                User: {
+                    select: {
+                        name: true,
+                        email: true,
+                        phone: true,
+                    }
+                },
+                Payment: true
+            },
+        });
+        return result;
+    } catch (error) {
+        console.log(error);
+        throw new Error("Failed to fetch room details");
+    }
+};

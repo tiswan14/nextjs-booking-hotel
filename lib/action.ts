@@ -1,10 +1,12 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { ContactSchema, RoomSchema } from "./zod";
+import { ContactSchema, ReserveSchema, RoomSchema } from "./zod";
 import { redirect } from "next/navigation";
 import { del } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
+import { differenceInCalendarDays } from "date-fns";
 
 export const saveRoom = async (image: string, prevState: unknown, formData: FormData) => {
     if (!image) return { message: "Image wajib di isi!" }
@@ -158,3 +160,65 @@ export const updateRoom = async (
     revalidatePath("/admin/room")
     redirect("/admin/room");
 }
+
+
+
+export const createReserve = async (
+    roomId: string,
+    price: number,
+    startDate: Date,
+    endDate: Date,
+    prevState: unknown,
+    formData: FormData
+) => {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return { redirectTo: `/login?redirect_url=room/${roomId}` };
+    }
+
+    const rawData = {
+        name: formData.get("name"),
+        phone: formData.get("phone"),
+    };
+
+    const validated = ReserveSchema.safeParse(rawData);
+    if (!validated.success) {
+        return { error: validated.error.flatten().fieldErrors };
+    }
+
+    const { name, phone } = validated.data;
+    const night = differenceInCalendarDays(endDate, startDate);
+    if (night <= 0) {
+        return { messageDate: "Tanggal setidaknya satu malam" };
+    }
+
+    const total = night * price;
+
+    try {
+        const reservation = await prisma.$transaction(async (tx) => {
+            await tx.user.update({
+                where: { id: session.user.id },
+                data: { name, phone },
+            });
+
+            return await tx.reservation.create({
+                data: {
+                    startDate,
+                    endDate,
+                    price: total,
+                    userId: session.user.id,
+                    roomId,
+                    Payment: { create: { amount: total } },
+                },
+            });
+        });
+
+        return { redirectTo: `/checkout/${reservation.id}` };
+
+    } catch (err) {
+        console.error(err);
+        return { message: "Gagal melakukan reservasi. Silakan coba lagi." };
+    }
+};
+
+

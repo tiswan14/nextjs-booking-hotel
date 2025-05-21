@@ -17,3 +17,8 @@ export const ContactSchema = object({
         .max(200, "Pesan tidak boleh melebihi 200 karakter"),
 });
 
+
+export const ReserveSchema = object({
+    name: string().min(3),
+    phone: string().min(3),
+})

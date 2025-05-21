@@ -3,6 +3,7 @@ import { getRoomDetailById } from "@/lib/data";
 import { notFound } from "next/navigation";
 import { IoCheckmark, IoPeopleOutline } from "react-icons/io5";
 import { formatCurrency } from "@/lib/utils";
+import ReserveForm from "./reserve-form";
 
 const RoomDetail = async ({ roomId }: { roomId: string }) => {
     const room = await getRoomDetailById(roomId);
@@ -53,8 +54,8 @@ const RoomDetail = async ({ roomId }: { roomId: string }) => {
                     </div>
 
                     {/* Tempat form reservasi nanti */}
-                    <div className="text-center text-sm text-gray-400">
-                        Form reservasi akan ditambahkan di sini.
+                    <div>
+                        <ReserveForm room={room} />
                     </div>
                 </div>
             </div>

@@ -51,9 +51,6 @@ const CreateForm = ({ amenities }: { amenities: Amenities[] }) => {
         });
     };
 
-
-
-
     const deleteImage = (image: string) => {
         startTransition(async () => {
             try {
